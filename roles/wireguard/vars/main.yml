@@ -1,0 +1,4 @@
+---
+# Static internal role variables (not meant to be overridden externally)
+# Per-host configuration (wg_role, wg_address, wg_peers, wg_server_peer)
+# should be set in inventory host_vars, NOT here.

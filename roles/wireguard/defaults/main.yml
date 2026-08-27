@@ -1,0 +1,15 @@
+---
+# WireGuard role defaults (lowest precedence - overridden by host_vars/inventory)
+wg_interface: wg0
+wg_port: 51820
+wg_address: 10.0.0.1/24
+wg_role: server
+
+# Server peers - override per-host in inventory or host_vars
+wg_peers: []
+
+# Client server peer - override per-host in inventory or host_vars
+wg_server_peer:
+  public_key: ""
+  allowed_ips: 10.0.0.1/32
+  endpoint: ""

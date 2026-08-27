@@ -1,0 +1,15 @@
+---
+# handlers file for wireguard
+- name: Check if wg-quick@wg0 is active before restart
+  command: systemctl is-active wg-quick@wg0
+  register: wg_active
+  failed_when: false
+  changed_when: false
+  listen: restart wireguard
+
+- name: Restart wg-quick@wg0
+  systemd:
+    name: wg-quick@wg0
+    state: restarted
+  when: wg_active.rc == 0
+  listen: restart wireguard

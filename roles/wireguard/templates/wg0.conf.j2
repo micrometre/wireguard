@@ -1,0 +1,29 @@
+[Interface]
+PrivateKey = {{ wg_private_key_content | default(wg_private_key.stdout) }}
+Address = {{ wg_address }}
+{% if wg_role == 'server' %}
+ListenPort = {{ wg_port }}
+{% endif %}
+SaveConfig = false
+
+{% if wg_role == 'server' %}
+{% for peer in wg_peers %}
+{% if peer.public_key != '' %}
+[Peer]
+PublicKey = {{ peer.public_key }}
+AllowedIPs = {{ peer.allowed_ips }}
+{% if peer.endpoint is defined and peer.endpoint != "" %}
+Endpoint = {{ peer.endpoint }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% elif wg_role == 'client' %}
+{% if wg_server_peer.public_key != '' %}
+[Peer]
+PublicKey = {{ wg_server_peer.public_key }}
+AllowedIPs = {{ wg_server_peer.allowed_ips }}
+{% if wg_server_peer.endpoint is defined and wg_server_peer.endpoint != "" %}
+Endpoint = {{ wg_server_peer.endpoint }}
+{% endif %}
+{% endif %}
+{% endif %}

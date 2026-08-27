@@ -1,0 +1,26 @@
+---
+- name: Configure FastAPI ANPR
+  hosts: multipass_vms
+  become: true
+  gather_facts: true
+  
+  roles:
+    - { role: users, tags: ["users", "setup"] }
+  
+  post_tasks:
+    - name: Display configuration status
+      debug:
+        msg: |
+          ========================================
+          Configuration Complete!
+          ========================================
+          Hostname: {{ ansible_facts.hostname }}
+          IP Address: {{ ansible_host }}
+          OS: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}
+          Python: {{ ansible_facts.python_version }}
+          ========================================
+          
+          Next steps:
+          - Add more roles to this playbook as needed
+          - Run 'make deploy' when ready to deploy the application
+          ========================================

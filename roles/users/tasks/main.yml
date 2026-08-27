@@ -1,0 +1,28 @@
+- name: Create a new regular user with sudo privileges
+  user:
+    name: "{{ item }}"
+    state: present
+    groups: sudo
+    append: true
+    create_home: true
+    shell: /bin/bash
+    password: "{{ regular_user_password | password_hash('sha512') }}"
+    update_password: on_create
+  loop: "{{ create_users }}"
+
+- name: Set authorized key for remote user
+  ansible.posix.authorized_key:
+    user: "{{ item }}"
+    state: present
+    key: "{{ copy_local_key }}"
+  loop: "{{ create_users }}"
+  notify:
+    - restart ssh
+
+- name: Allow passwordless sudo for created users
+  lineinfile:
+    dest: /etc/sudoers
+    line: '{{ item }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+  loop: "{{ create_users }}"
+  when: create_passwordless_sudo | default(false)

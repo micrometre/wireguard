@@ -1,0 +1,8 @@
+---
+create_users:
+    - ubuntu
+create_restricted_user:
+    - anpr
+copy_local_key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+regular_user_password: "password"
+restricted_user_password: "password"

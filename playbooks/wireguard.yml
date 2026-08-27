@@ -1,0 +1,62 @@
+---
+- name: Install and Configure WireGuard
+  hosts: multipass_vms
+  become: true
+  gather_facts: true
+
+  roles:
+    - { role: wireguard, tags: ["wireguard"] }
+
+  post_tasks:
+    - name: Gather WireGuard interface status
+      command: wg show {{ wg_interface }}
+      register: wg_show_output
+      changed_when: false
+      failed_when: false
+      when: peers_configured
+
+    - name: Gather WireGuard IP address
+      command: ip addr show {{ wg_interface }}
+      register: wg_ip_output
+      changed_when: false
+      failed_when: false
+      when: peers_configured
+
+    - name: Display WireGuard status
+      debug:
+        msg: |
+          ========================================
+          WireGuard — {{ ansible_facts.hostname }}
+          ========================================
+          Role     : {{ wg_role | capitalize }}
+          Interface: {{ wg_interface }}  ({{ wg_address }})
+          {% if wg_role == 'server' %}
+          Port     : {{ wg_port }}
+          {% endif %}
+          Public Key: {{ wg_public_key_content | default(wg_public_key.stdout) | trim }}
+          Status   : {{ 'ACTIVE — tunnel is up' if peers_configured else 'PENDING — awaiting peer keys' }}
+          ========================================
+          {% if not peers_configured %}
+          ACTION REQUIRED — peers not yet configured:
+
+          {% if wg_role == 'server' %}
+            1. Add client-node's public key to inventory/hosts.yml:
+               wg_peers[0].public_key: "<client-node public key>"
+
+            2. Re-run:  make wireguard
+          {% else %}
+            1. Add server-node's public key to inventory/hosts.yml:
+               wg_server_peer.public_key: "<server-node public key>"
+
+            2. Re-run:  make wireguard
+          {% endif %}
+          {% else %}
+          --- Interface ---
+          {{ wg_ip_output.stdout | default('(unavailable)') }}
+
+          --- Tunnel ---
+          {{ wg_show_output.stdout | default('(unavailable)') }}
+
+          Ping peer: ping {{ '10.0.0.2' if wg_role == 'server' else '10.0.0.1' }}
+          {% endif %}
+          ========================================
