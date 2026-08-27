@@ -93,7 +93,7 @@ Applies the peer configurations and establishes the VPN connection.
 - `make provision` - Provision Multipass VMs
 - `make copy-ssh-keys` - Copy SSH keys to VMs
 - `make update-inventory` - Update inventory with VM IPs
-- `make configure` - Configure base system (packages, users)
+- `make configure` - Configure base system (users)
 - `make wireguard` - Install and configure WireGuard VPN
 - `make destroy` - Destroy all VMs and clean up
 - `make status` - Check VM status
@@ -108,7 +108,6 @@ Applies the peer configurations and establishes the VPN connection.
 │   ├── configure.yml      # Base system configuration
 │   └── wireguard.yml      # WireGuard installation and config
 ├── roles/
-│   ├── common/            # Common system packages and updates
 │   ├── users/             # User management
 │   └── wireguard/         # WireGuard VPN role
 │       ├── tasks/         # Installation and configuration tasks
